@@ -29,6 +29,12 @@ sub should_receive {
 }
 
 
+sub should_not_receive {
+    my ($self, $message) = @_;
+    $self->should_receive($message)->exactly(0)->times;
+}
+
+
 sub stub {
     my ($self, $method_name, $return_value) = @_;
     $self->should_receive($method_name)->and_return($return_value)->any_number_of_times;
@@ -37,7 +43,6 @@ sub stub {
 
 sub __teardown {
     my ($self) = @_;
-    
     for my $i (values %{$self->_messages}) {
         $i->check;
     }
@@ -54,7 +59,7 @@ sub AUTOLOAD {
     my $expectation = $self->_messages->{$method};
 
     unless ($expectation) {
-        die "Unmocked method '$method' called on '" . $self->_name . "'";
+        warn "Unmocked method '$method' called on '" . $self->_name . "'";
         return;
     }
 

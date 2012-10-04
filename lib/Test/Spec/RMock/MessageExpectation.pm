@@ -101,13 +101,19 @@ sub at_least {
 
 sub once {
     my ($self) = @_;
-    $self->_call_count_constraint(Test::Spec::RMock::ExactlyConstraint(1));
+    $self->exactly(1);
     $self;
 }
 
 sub twice {
     my ($self) = @_;
-    $self->_call_count_constraint(Test::Spec::RMock::ExactlyConstraint(2));
+    $self->exactly(2);
+    $self;
+}
+
+sub exactly {
+    my ($self, $n) = @_;
+    $self->_call_count_constraint(Test::Spec::RMock::ExactlyConstraint->new($n));
     $self;
 }
 

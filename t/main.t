@@ -43,6 +43,20 @@ describe 'Test::Spec::RMock' => sub {
         };
     };
 
+    describe 'should_not_receive' => sub {
+        it 'should pass when the mocked method is never called' => sub {
+            my $mock = rmock('foo');
+            $mock->should_not_receive('bar');
+            pass('');
+        };
+
+        it 'should fail if the mocked method is called' => sub {
+            my $mock = rmock('foo');
+            $mock->should_not_receive('bar');
+            $mock->bar;
+        };
+    };
+
 };
 
 runtests unless caller;
