@@ -4,10 +4,22 @@ use_ok 'Test::Spec::RMock';
 
 describe 'Test::Spec::RMock' => sub {
 
-    it "should stuff" => sub {
-        my $foo = Test::Spec::RMock->new('foo');
-        $foo->should_receive('bar');
-        $foo->baz
+    describe 'method stubs' => sub {
+        my $mock;
+        before each => sub {
+            $mock = rmock('foo');
+            $mock->stub('bar' => 1);
+        };
+
+        it "should take as arguments name and return value" => sub {
+            is($mock->bar, 1);
+        };
+
+        it "should return the same value each time it is called" => sub {
+            is($mock->bar, 1);
+            is($mock->bar, 1);
+            is($mock->bar, 1);
+        }
     };
 
 };
