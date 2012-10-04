@@ -53,6 +53,23 @@ sub call {
 }
 
 
+sub is_conditions_satisfied {
+    my ($self, @args) = @_;
+    $self->_call_count_constraint->call($self->_number_of_times_called+1)
+        && $self->_arguments_matches(@args);
+}
+
+
+sub _arguments_matches {
+    my ($self, @args) = @_;
+    return 1 unless defined $self->_arguments;
+    return 0 unless scalar(@args) == scalar(@{$self->_arguments});
+    for my $i (0..$#{$self->_arguments}) {
+        return 0 unless $args[$i] eq $self->_arguments->[$i];
+    }
+    return 1;
+}
+
 sub check {
     my ($self) = @_;
     $self->_check_call_constraint;
@@ -62,6 +79,12 @@ sub check {
 sub _increment_call_counter {
     my ($self) = @_;
     $self->_number_of_times_called($self->_number_of_times_called + 1);
+}
+
+
+sub _decrement_call_counter {
+    my ($self) = @_;
+    $self->_number_of_times_called($self->_number_of_times_called - 1);
 }
 
 

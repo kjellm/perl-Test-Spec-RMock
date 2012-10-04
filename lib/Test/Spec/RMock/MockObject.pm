@@ -19,7 +19,8 @@ around BUILDARGS => sub {
 sub should_receive {
     my ($self, $message) = @_;
     my $expectation = Test::Spec::RMock::MessageExpectation->new($message);
-    $self->_messages->{$message} = $expectation;
+    $self->_messages->{$message} ||= [];
+    push @{$self->_messages->{$message}}, $expectation;
 
     my $context = Test::Spec->current_context
         || Carp::croak "Test::Spec::RMocks only works in conjunction with Test::Spec";
@@ -43,8 +44,10 @@ sub stub {
 
 sub __teardown {
     my ($self) = @_;
-    for my $i (values %{$self->_messages}) {
-        $i->check;
+    for my $ms (values %{$self->_messages}) {
+        for my $m (@$ms) { 
+            $m->check;
+        }
     }
 }
 
@@ -56,14 +59,20 @@ sub AUTOLOAD {
     my $method = $AUTOLOAD;
     $method =~ s/.*:://;
 
-    my $expectation = $self->_messages->{$method};
+    my $expectations = $self->_messages->{$method};
 
-    unless ($expectation) {
+    unless ($expectations) {
         warn "Unmocked method '$method' called on '" . $self->_name . "'";
         return;
     }
 
-    return $expectation->call(@_);
+    for my $e (@$expectations) {
+        return $e->call(@_) if $e->is_conditions_satisfied(@_);
+    }
+
+    # Found no expectations that the call satisfied. Need to call the first
+    # one to trigger call constraint error
+    return $expectations->[0]->call(@_);
 }
 
 1;
