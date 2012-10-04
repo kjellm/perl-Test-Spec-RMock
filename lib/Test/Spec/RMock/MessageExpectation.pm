@@ -27,7 +27,7 @@ has _number_of_times_called => (
 
 has _call_count_constraint => (
     is       => 'rw',
-    default  => sub { $_[0]->_build_call_constraint(1) },
+    default  => sub { Test::Spec::RMock::ExactlyConstraint->new(1) },
     init_arg => undef,
 );
 
@@ -76,29 +76,44 @@ sub _check_arguments {
 sub _check_call_constraint {
     my ($self) = @_;
     fail sprintf("'%s' failed call count constraint", $self->_name)
-        unless $self->_call_count_constraint->($self->_number_of_times_called);
-}
-
-sub _build_call_constraint {
-    my ($self, $limit) = @_;
-    sub { $self->_number_of_times_called == $limit; }
+        unless $self->_call_count_constraint->call($self->_number_of_times_called);
 }
 
 ###  RECEIVE COUNTS
 
 sub any_number_of_times {
     my ($self) = @_;
-    $self->_call_count_constraint(sub {1});
+    $self->_call_count_constraint(Test::Spec::RMock::AnyConstraint->new);
     $self;
 }
 
+sub at_least_once {
+    my ($self) = @_;
+    $self->_call_count_constraint(Test::Spec::RMock::AtLeastConstraint->new(1));
+    $self;
+}
+
+sub at_least {
+    my ($self, $n) = @_;
+    $self->_call_count_constraint(Test::Spec::RMock::AtLeastConstraint->new($n));
+    $self;
+}
+
+sub once {
+    my ($self) = @_;
+    $self->_call_count_constraint(Test::Spec::RMock::ExactlyConstraint(1));
+    $self;
+}
 
 sub twice {
     my ($self) = @_;
-    $self->_call_count_constraint($self->_build_call_constraint(2));
+    $self->_call_count_constraint(Test::Spec::RMock::ExactlyConstraint(2));
     $self;
 }
 
+sub times {
+    return @_;
+}
 
 ### RESPONSES
 

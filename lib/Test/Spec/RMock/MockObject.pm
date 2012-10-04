@@ -10,7 +10,6 @@ has _messages => (
     default  => sub { {} },
 );
 
-
 around BUILDARGS => sub {
   my ($orig, $class, $name) = @_;
   $orig->($class, _name => $name);
@@ -24,7 +23,7 @@ sub should_receive {
 
     my $context = Test::Spec->current_context
         || Carp::croak "Test::Spec::RMocks only works in conjunction with Test::Spec";
-    $context->on_leave(sub { $self->_teardown });
+    $context->on_leave(sub { $self->__teardown });
 
     $expectation;
 }
@@ -36,8 +35,9 @@ sub stub {
 }
 
 
-sub _teardown {
+sub __teardown {
     my ($self) = @_;
+    
     for my $i (values %{$self->_messages}) {
         $i->check;
     }

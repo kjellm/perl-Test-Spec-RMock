@@ -4,6 +4,11 @@ use_ok 'Test::Spec::RMock';
 
 describe 'Test::Spec::RMock' => sub {
 
+    it "should report calls to unmocked methods" => sub {
+        my $mock = rmock('foo');
+        $mock->bar;
+    };
+
     describe 'method stubs' => sub {
         my $mock;
         before each => sub {
@@ -20,6 +25,22 @@ describe 'Test::Spec::RMock' => sub {
             is($mock->bar, 1);
             is($mock->bar, 1);
         }
+    };
+
+    context 'call constraints' => sub {
+        describe 'at_least_once()' => sub {
+            it 'should fail when called zero times' => sub {
+                my $mock = rmock('foo');
+                $mock->should_receive('bar')->at_least_once;
+            };
+
+            it 'should pass when called one time' => sub {
+                my $mock = rmock('foo');
+                $mock->should_receive('bar')->at_least_once;
+                $mock->bar;
+                pass('');
+            };
+        };
     };
 
 };
