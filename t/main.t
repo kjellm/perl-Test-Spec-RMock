@@ -29,7 +29,7 @@ describe 'Test::Spec::RMock' => sub {
 
     context 'call constraints' => sub {
         describe 'at_least_once()' => sub {
-            it 'should fail when called zero times' => sub {
+            xit 'should fail when called zero times' => sub {
                 my $mock = rmock('foo');
                 $mock->should_receive('bar1')->at_least_once;
             };
@@ -50,7 +50,7 @@ describe 'Test::Spec::RMock' => sub {
             pass('');
         };
 
-        it 'should fail if the mocked method is called' => sub {
+        xit 'should fail if the mocked method is called' => sub {
             my $mock = rmock('foo');
             $mock->should_not_receive('bar4');
             $mock->bar4;
@@ -76,7 +76,7 @@ describe 'Test::Spec::RMock' => sub {
             pass('');
         };
 
-        it 'should fail' => sub {
+        xit 'should fail' => sub {
             my $mock = rmock('foo');
             $mock->should_receive('bar7');
             $mock->should_receive('bar7');
