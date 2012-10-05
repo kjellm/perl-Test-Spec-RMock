@@ -3,29 +3,31 @@ package Test::Spec::RMock::MockObject;
 use Moose;
 use namespace::autoclean;
 
-has _name => (is => 'ro');
+has __name => (is => 'ro');
 
-has _messages => (
+has __messages => (
     is       => 'ro',
     default  => sub { {} },
 );
 
+has __messages_received => (
+    is       => 'ro',
+    default  => sub { [] },
+);
+
 around BUILDARGS => sub {
   my ($orig, $class, $name) = @_;
-  $orig->($class, _name => $name);
+  $orig->($class, __name => $name);
 };
 
 
 sub should_receive {
     my ($self, $message) = @_;
     my $expectation = Test::Spec::RMock::MessageExpectation->new($message);
-    $self->_messages->{$message} ||= [];
-    push @{$self->_messages->{$message}}, $expectation;
-
+    $self->__register_expectation($message, $expectation);
     my $context = Test::Spec->current_context
         || Carp::croak "Test::Spec::RMocks only works in conjunction with Test::Spec";
     $context->on_leave(sub { $self->__teardown });
-
     $expectation;
 }
 
@@ -42,9 +44,16 @@ sub stub {
 }
 
 
+sub __register_expectation {
+    my ($self, $message, $expectation) = @_;
+    $self->__messages->{$message} ||= [];
+    push @{$self->__messages->{$message}}, $expectation;
+}
+
+
 sub __teardown {
     my ($self) = @_;
-    for my $ms (values %{$self->_messages}) {
+    for my $ms (values %{$self->__messages}) {
         for my $m (@$ms) { 
             $m->check;
         }
@@ -53,26 +62,33 @@ sub __teardown {
 
 
 our $AUTOLOAD;
+
+sub __find_method_proxy {
+    my ($self, $message_name, @args) = @_;
+    my $expectations = $self->__messages->{$message_name};
+    return unless $expectations;
+    for my $e (@$expectations) {
+        return $e if $e->is_conditions_satisfied(@args);
+    }
+    return $expectations->[0];
+}
+
+sub __get_message_name {
+    my $name = $AUTOLOAD;
+    $name =~ s/.*:://;
+    $name;
+}
+
 sub AUTOLOAD {
-    my $self = shift;
-
-    my $method = $AUTOLOAD;
-    $method =~ s/.*:://;
-
-    my $expectations = $self->_messages->{$method};
-
-    unless ($expectations) {
-        warn "Unmocked method '$method' called on '" . $self->_name . "'";
+    my ($self, @args) = @_;
+    my $message_name = $self->__get_message_name;
+    push @{$self->__messages_received}, [$message_name, @args];
+    my $proxy = $self->__find_method_proxy($message_name, @args);
+    unless ($proxy) {
+        warn "Unmocked method '$message_name' called on '" . $self->__name . "'";
         return;
     }
-
-    for my $e (@$expectations) {
-        return $e->call(@_) if $e->is_conditions_satisfied(@_);
-    }
-
-    # Found no expectations that the call satisfied. Need to call the first
-    # one to trigger call constraint error
-    return $expectations->[0]->call(@_);
+    return $proxy->call(@args);
 }
 
 1;

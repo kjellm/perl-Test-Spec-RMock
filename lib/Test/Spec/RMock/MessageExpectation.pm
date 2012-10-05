@@ -3,8 +3,6 @@ package Test::Spec::RMock::MessageExpectation;
 use Moose;
 use namespace::autoclean;
 
-use Test::More;
-
 has _name => (is => 'ro');
 
 has _return_value => (
@@ -47,7 +45,6 @@ around BUILDARGS => sub {
 sub call {
     my ($self, @args) = @_;
     $self->_increment_call_counter;
-    $self->_check_arguments(@args);
     die $self->_exception if $self->_exception;
     $self->_return_value;
 }
@@ -88,17 +85,9 @@ sub _decrement_call_counter {
 }
 
 
-sub _check_arguments {
-    my ($self, @args) = @_;
-    return 1 unless defined $self->_arguments;
-    is(scalar(@args), scalar(@{$self->_arguments}), 'Number of arguments to '.$self->_name.' matches expectation');
-    is_deeply(\@args, $self->_arguments);
-}
-
-
 sub _check_call_constraint {
     my ($self) = @_;
-    fail sprintf("'%s' failed call count constraint", $self->_name)
+    warn sprintf("'%s' failed call count constraint", $self->_name)
         unless $self->_call_count_constraint->call($self->_number_of_times_called);
 }
 
