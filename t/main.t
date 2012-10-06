@@ -73,15 +73,14 @@ describe 'Test::Spec::RMock' => sub {
 
         before each => sub {
             $mock = rmock('foo')->__cancel;
-                        
         };
-        
+
         it "should pass when expecting no arguments and none are given" => sub {
             $mock->should_receive('bar')->with();
             $mock->bar;
             is($mock->__check, '');
         };
-        
+
         it "should fail when there are arguments when none were expected" => sub {
             $mock->should_receive('bar')->with();
             $mock->bar(1);
@@ -93,13 +92,13 @@ describe 'Test::Spec::RMock' => sub {
             $mock->bar(1);
             is($mock->__check, '');
         };
-        
+
         it "should pass when expecting the String 'BAZ' and it is given" => sub {
             $mock->should_receive('bar')->with('BAZ');
             $mock->bar('BAZ');
             is($mock->__check, '');
         };
-        
+
         it "should fail when expecting the number '1' and '2' is given" => sub {
             $mock->should_receive('bar')->with(1);
             $mock->bar(2);

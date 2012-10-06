@@ -1,8 +1,6 @@
 package Test::Spec::RMock::AnyConstraint;
 
-use Moose;
-use namespace::autoclean;
-
+sub new  { bless {}, $_[0] }
 sub call { 1 }
 
 1;

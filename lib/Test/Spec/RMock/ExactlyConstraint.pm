@@ -1,18 +1,13 @@
 package Test::Spec::RMock::ExactlyConstraint;
 
-use Moose;
-use namespace::autoclean;
-
-has _target => (is => 'ro');
-
-around BUILDARGS => sub {
-    my ($orig, $class, $target) = @_;
-    my $self = $orig->($class, _target => $target);
-};
+sub new {
+    my ($class, $target) = @_;
+    bless { _target => $target }, $class;
+}
 
 sub call {
     my ($self, $times_called) = @_;
-    $times_called == $self->_target;
+    $times_called == $self->{_target};
 }
 
 1;

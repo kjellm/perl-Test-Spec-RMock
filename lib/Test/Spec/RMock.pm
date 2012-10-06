@@ -1,22 +1,21 @@
 package Test::Spec::RMock;
 # ABSTRACT: a mocking library for Test::Spec
 
-use Moose;
-use namespace::autoclean;
+use warnings;
+use strict;
 
-use Moose::Exporter;
+use Exporter qw(import);
+
 use Test::Spec::RMock::AnyConstraint;
 use Test::Spec::RMock::AtLeastConstraint;
 use Test::Spec::RMock::ExactlyConstraint;
 use Test::Spec::RMock::MessageExpectation;
 use Test::Spec::RMock::MockObject;
 
-Moose::Exporter->setup_import_methods(
-    with_meta => [ qw(rmock) ],
-);
+our @EXPORT = qw(rmock);
 
 sub rmock {
-    my (undef, $name) = @_;
+    my ($name) = @_;
     Test::Spec::RMock::MockObject->new($name);
 }
 
@@ -46,6 +45,10 @@ __END__
 =item *
 
 L<Test::Spec>
+
+=item *
+
+L<Test::Spec::Mock>
 
 =back
 
