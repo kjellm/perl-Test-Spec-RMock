@@ -1,5 +1,7 @@
 {{$NEXT}}
 
+ - Support multiple expectations for the same message
+
 2012-10-05: version 0.001
 
  - Initial releas
