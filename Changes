@@ -1,5 +1,11 @@
 {{$NEXT}}
 
+ - Fixed a bug that was triggered when argument matching failed.
+
+ - Added documentation
+
+ - Removed the dependency on Moose
+
 2012-10-06: version 0.002    
 
  - Support multiple expectations for the same message
