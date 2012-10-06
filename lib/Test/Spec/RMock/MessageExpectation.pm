@@ -72,12 +72,15 @@ sub is_call_constrint_satisfied {
     $self->_call_count_constraint->call($self->_number_of_times_called);
 }
 
-
 sub call_contraint_error_message {
     my ($self) = @_;
     "Call constraint failed";
 }
 
+sub argument_matching_error_message {
+    my ($self) = @_;
+    "Argument matching failed";
+}
 
 sub _increment_call_counter {
     my ($self) = @_;

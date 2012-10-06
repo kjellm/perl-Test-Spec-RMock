@@ -70,7 +70,10 @@ sub __find_method_proxy {
     for my $e (@$expectations) {
         return $e if $e->does_arguments_match(@args);
     }
-    return;
+    for my $e (@$expectations) {
+        push @{$self->{_problems_found}}, $e->argument_matching_error_message;
+    }
+    return $expectations->[0];
 }
 
 our $AUTOLOAD;
@@ -83,12 +86,6 @@ sub AUTOLOAD {
         return;
     }
     my $proxy = $self->__find_method_proxy($expectations, @args);
-    unless ($proxy) {
-        for my $e (@$expectations) {
-            push @{$self->{_problems_found}}, $e->argument_matching_error_message;
-        }
-        return;
-    }
     return $proxy->call(@args);
 }
 

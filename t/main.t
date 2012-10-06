@@ -33,21 +33,21 @@ describe 'Test::Spec::RMock' => sub {
         describe 'at_least_once()' => sub {
             it 'should fail when called zero times' => sub {
                 my $mock = rmock('foo')->__cancel;
-                $mock->should_receive('bar1')->at_least_once;
+                $mock->should_receive('bar')->at_least_once;
                 is($mock->__check, "Call constraint failed");
             };
 
             it 'should pass when called one time' => sub {
                 my $mock = rmock('foo');
-                $mock->should_receive('bar2')->at_least_once->and_return(1);
-                is($mock->bar2, 1);
+                $mock->should_receive('bar')->at_least_once->and_return(1);
+                is($mock->bar, 1);
             };
 
             it 'should pass when called more than one time' => sub {
                 my $mock = rmock('foo');
-                $mock->should_receive('bar2')->at_least_once->and_return(1);
+                $mock->should_receive('bar')->at_least_once->and_return(1);
                 my @results = ();
-                push @results, $mock->bar2 for 1..4;
+                push @results, $mock->bar for 1..4;
                 is_deeply(\@results, [1, 1, 1, 1]);
             };
         };
@@ -56,44 +56,89 @@ describe 'Test::Spec::RMock' => sub {
     describe 'should_not_receive' => sub {
         it 'should pass when the mocked method is never called' => sub {
             my $mock = rmock('foo');
-            $mock->should_not_receive('bar3');
+            $mock->should_not_receive('bar');
             is($mock->__check, '');
         };
 
         it 'should fail if the mocked method is called' => sub {
             my $mock = rmock('foo')->__cancel;
-            $mock->should_not_receive('bar4');
-            $mock->bar4;
+            $mock->should_not_receive('bar');
+            $mock->bar;
             is($mock->__check, 'Call constraint failed');
+        };
+    };
+
+    describe 'argument matching' => sub {
+        my ($mock);
+
+        before each => sub {
+            $mock = rmock('foo')->__cancel;
+                        
+        };
+        
+        it "should pass when expecting no arguments and none are given" => sub {
+            $mock->should_receive('bar')->with();
+            $mock->bar;
+            is($mock->__check, '');
+        };
+        
+        it "should fail when there are arguments when none were expected" => sub {
+            $mock->should_receive('bar')->with();
+            $mock->bar(1);
+            is($mock->__check, 'Argument matching failed');
+        };
+
+        it "should pass when expecting the number '1' and it is given" => sub {
+            $mock->should_receive('bar')->with(1);
+            $mock->bar(1);
+            is($mock->__check, '');
+        };
+        
+        it "should pass when expecting the String 'BAZ' and it is given" => sub {
+            $mock->should_receive('bar')->with('BAZ');
+            $mock->bar('BAZ');
+            is($mock->__check, '');
+        };
+        
+        it "should fail when expecting the number '1' and '2' is given" => sub {
+            $mock->should_receive('bar')->with(1);
+            $mock->bar(2);
+            is($mock->__check, 'Argument matching failed');
+        };
+
+        it "should pass when expecting (1, 'two') and it is given" => sub {
+            $mock->should_receive('bar')->with(1, 'two');
+            $mock->bar(1, 'two');
+            is($mock->__check, '');
         };
     };
 
     context 'multiple mocks for the same message' => sub {
         it 'should check the next matching expectation when the first fails' => sub {
             my $mock = rmock('foo');
-            $mock->should_receive('bar6');
-            $mock->should_receive('bar6');
-            $mock->bar6;
-            $mock->bar6;
+            $mock->should_receive('bar');
+            $mock->should_receive('bar');
+            $mock->bar;
+            $mock->bar;
             is($mock->__check, '');
         };
 
         it 'should pass when different argument matching is required' => sub {
             my $mock = rmock('foo');
-            $mock->should_receive('bar5')->with(1);
-            $mock->should_receive('bar5')->with(2);
-            $mock->bar5(2);
-            $mock->bar5(1);
+            $mock->should_receive('bar')->with(1);
+            $mock->should_receive('bar')->with(2);
+            $mock->bar(2);
+            $mock->bar(1);
             is($mock->__check, '');
         };
 
         it 'should fail when the combined call constraints are exhausted' => sub {
             my $mock = rmock('foo')->__cancel;
-            $mock->should_receive('bar7');
-            $mock->should_receive('bar7');
-            $mock->bar7;
-            $mock->bar7;
-            $mock->bar7;
+            $mock->should_receive('bar');
+            $mock->should_receive('bar');
+            $mock->bar;
+            $mock->bar;
+            $mock->bar;
             is($mock->__check, 'Call constraint failed');
         };
     };
