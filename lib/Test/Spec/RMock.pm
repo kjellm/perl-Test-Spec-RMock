@@ -38,6 +38,81 @@ __END__
 
   runtests unless caller;
 
+=head1 EXPORTED METHODS
+
+=over 4
+
+=item rmock($name)
+
+Creates a mock object with the given name.
+
+C<$name> is used in error messages. Often a good choice is the name of
+the class or role you are mocking.
+
+=back
+
+=head1 USING MOCK OBJECTS
+
+=head2 Method stubs
+
+You want to use method stubs on all messages that you don't care to
+set expectations on. Any interactions that don't are important for the
+test you are writing.
+
+=over 4
+
+=item $mock->stub($message_name => $return_value)
+
+This creates a method stub on the mock object returning
+C<$return_value> each time it is called.
+
+=back
+
+=head2 Method mocks
+
+Mocking methods allows you to set expectations on the messages that
+the mocked object should receive. 
+
+=over 4
+
+=item $mock->should_receive($name)
+
+=item $mock->should_not_receive($name)
+
+=back
+
+=head2 Message expectations
+
+All return $self so that you can chain them.
+
+=over 4
+
+=item $expectation->and_return(...)
+
+=item $expectation->and_raise($exception)
+
+=item $expectation->with(...)
+
+=item $expectation->any_number_of_times()
+
+=item $expectation->at_least_once()
+
+=item $expectation->at_least($n)
+
+    $expectation->at_least(4)->times
+
+=item $expectation->once()
+
+=item $expectation->exactly($n)
+
+    $expectation->exactly(4)->times
+
+=item $expectation->times
+
+Noop
+
+=back
+
 =head1 SEE ALSO
 
 =over 4
