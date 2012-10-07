@@ -7,6 +7,7 @@ sub new {
         _messages       => {},
         _problems_found => [],
         _canceled       => 0,
+        _is_null_object => 0,
     };
     bless $self, $class;
     my $context = Test::Spec->current_context
@@ -30,6 +31,12 @@ sub should_not_receive {
 sub stub {
     my ($self, $method_name, $return_value) = @_;
     $self->should_receive($method_name)->and_return($return_value)->any_number_of_times;
+}
+
+sub as_null_object {
+    my ($self) = @_;
+    $self->{_is_null_object} = 1;
+    $self;
 }
 
 sub __cancel {
@@ -82,6 +89,7 @@ sub AUTOLOAD {
     my $message_name = $self->__get_message_name;
     my $expectations = $self->{_messages}{$message_name};
     unless ($expectations) {
+        return $self if $self->{_is_null_object};
         push @{$self->{_problems_found}}, "Unmocked method '$message_name' called on '" . $self->{_name} . "'";
         return;
     }

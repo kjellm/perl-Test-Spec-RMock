@@ -53,7 +53,7 @@ describe 'Test::Spec::RMock' => sub {
         };
     };
 
-    describe 'should_not_receive' => sub {
+    describe 'should_not_receive()' => sub {
         it 'should pass when the mocked method is never called' => sub {
             my $mock = rmock('foo');
             $mock->should_not_receive('bar');
@@ -65,6 +65,28 @@ describe 'Test::Spec::RMock' => sub {
             $mock->should_not_receive('bar');
             $mock->bar;
             is($mock->__check, 'Call constraint failed');
+        };
+    };
+
+    describe 'as_null_object' => sub {
+        my ($mock);
+
+        before each => sub {
+            $mock = rmock('foo')->__cancel;
+        };
+
+        it 'should just return $self on calls to unmocked/unstubbed methods' => sub {
+            my $mock = rmock('foo');
+            $mock->as_null_object;
+            is($mock->non_existing_method(), $mock);
+        };
+
+        it 'should report no errors on calls to unmocked/unstubbed methods' => sub {
+            my $mock = rmock('foo')->__cancel;
+            $mock->as_null_object;
+            $mock->non_existing_method();
+            $mock->another_non_existing_method(qw(with some arguments));
+            is($mock->__check, '');
         };
     };
 
