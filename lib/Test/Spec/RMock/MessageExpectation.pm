@@ -28,10 +28,10 @@ sub is_all_conditions_satisfied {
 
 sub does_arguments_match {
     my ($self, @args) = @_;
-    return 1 unless defined $self->{_arguments};
-    return unless scalar(@args) == scalar(@{$self->{_arguments}});
+    return 1 if $self->_any_arguments_allowed;
+    return if scalar(@args) != scalar(@{$self->{_arguments}});
     for my $i (0..$#{$self->{_arguments}}) {
-        return unless $args[$i] eq $self->{_arguments}[$i];
+        return if $args[$i] ne $self->{_arguments}[$i];
     }
     return 1;
 }
@@ -50,6 +50,13 @@ sub argument_matching_error_message {
     my ($self) = @_;
     "Argument matching failed";
 }
+
+
+sub _any_arguments_allowed {
+    my ($self) = @_;
+    !defined $self->{_arguments};
+}
+
 
 ###  RECEIVE COUNTS
 
