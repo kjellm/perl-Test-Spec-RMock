@@ -15,18 +15,29 @@ describe 'Test::Spec::RMock' => sub {
         my $mock;
         before each => sub {
             $mock = rmock('foo');
-            $mock->stub('bar' => 1);
         };
 
         it "should take as arguments name and return value" => sub {
+            $mock->stub('bar' => 1);
             is($mock->bar, 1);
         };
 
         it "should return the same value each time it is called" => sub {
+            $mock->stub('bar' => 1);
             my @results = ();
             push @results, $mock->bar for 1..3;
             is_deeply(\@results, [1, 1, 1]);
-        }
+        };
+
+        it "should allow defining multiple stubbed methods with one call to stub()" => sub {
+            $mock->stub(
+                foo => 1,
+                bar => 2,
+                baz => 3,
+            );
+            my @results = ($mock->foo, $mock->bar, $mock->baz);
+            is_deeply(\@results, [1, 2, 3]);
+        };
     };
 
     context 'call constraints' => sub {

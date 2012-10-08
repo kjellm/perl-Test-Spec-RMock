@@ -29,8 +29,11 @@ sub should_not_receive {
 }
 
 sub stub {
-    my ($self, $method_name, $return_value) = @_;
-    $self->should_receive($method_name)->and_return($return_value)->any_number_of_times;
+    my ($self, %spec) = @_;
+
+    while (my ($method_name, $return_value) = each %spec) {
+        $self->should_receive($method_name)->and_return($return_value)->any_number_of_times;
+    }
 }
 
 sub as_null_object {
