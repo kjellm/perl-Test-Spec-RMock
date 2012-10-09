@@ -1,5 +1,11 @@
 {{$NEXT}}
 
+ - Added support for stub several methods with one call to stub()
+
+ - Added support for stub chaining
+
+2012-10-07: version 0.004
+
  - Added support for creating null object mocks
 
 2012-10-06: version 0.003    
