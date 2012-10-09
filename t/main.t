@@ -40,6 +40,14 @@ describe 'Test::Spec::RMock' => sub {
         };
     };
 
+    describe 'stub chaining' => sub {
+        it "should allow you to list methods to chain and let you set a return value for the last method" => sub {
+            my $mock = rmock('foo');
+            $mock->stub_chain(qw(one two three))->and_return('four');
+            is($mock->one->two->three, 'four');
+        };
+    };
+
     context 'call constraints' => sub {
         describe 'at_least_once()' => sub {
             it 'should fail when called zero times' => sub {
