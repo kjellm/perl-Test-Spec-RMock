@@ -4,11 +4,21 @@ BEGIN { use_ok 'Test::Spec::RMock' };
 
 describe 'Test::Spec::RMock' => sub {
 
-    it "should report calls to unmocked methods" => sub {
-        my $mock = rmock('foo')->__cancel;
-        $mock->bar;
-        $mock->__check;
-        is($mock->__check, "Unmocked method 'bar' called on 'foo'");
+    describe "calling unmocked methods" => sub {
+        my ($mock);
+        before each => sub {
+            $mock = rmock('foo')->__cancel;
+        };
+
+        it "should fail when calling without any arguments" => sub {
+            $mock->bar;
+            is($mock->__check, "Unmocked method 'bar' called on 'foo' with ()");
+        };
+
+        it "should fail when calling with arguments" => sub {
+            $mock->bar(1, 2, 3);
+            is($mock->__check, "Unmocked method 'bar' called on 'foo' with ('1', '2', '3')");
+        };
     };
 
     describe 'method stubs' => sub {

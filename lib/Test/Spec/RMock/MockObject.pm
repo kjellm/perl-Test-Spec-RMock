@@ -105,7 +105,11 @@ sub AUTOLOAD {
     my $expectations = $self->{_messages}{$message_name};
     unless ($expectations) {
         return $self if $self->{_is_null_object};
-        push @{$self->{_problems_found}}, "Unmocked method '$message_name' called on '" . $self->{_name} . "'";
+        push @{$self->{_problems_found}},
+            sprintf("Unmocked method '%s' called on '%s' with (%s)", 
+                    $message_name, 
+                    $self->{_name},
+                    join(', ', map {"'$_'"} @args));
         return;
     }
     my $proxy = $self->__find_method_proxy($expectations, @args);
