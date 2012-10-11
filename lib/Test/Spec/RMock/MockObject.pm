@@ -78,7 +78,7 @@ sub __check {
     my ($self) = @_;
     for my $ms (values %{$self->{_messages}}) {
         for my $m (@$ms) { 
-            push @{$self->{_problems_found}}, $m->call_contraint_error_message unless $m->is_call_constrint_satisfied;
+            push @{$self->{_problems_found}}, $m->call_contraint_error_message($self->{_name}) unless $m->is_call_constrint_satisfied;
         }
     }
     join("\n", @{$self->{_problems_found}});

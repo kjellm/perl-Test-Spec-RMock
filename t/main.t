@@ -63,7 +63,7 @@ describe 'Test::Spec::RMock' => sub {
             it 'should fail when called zero times' => sub {
                 my $mock = rmock('foo')->__cancel;
                 $mock->should_receive('bar')->at_least_once;
-                is($mock->__check, "Call constraint failed");
+                is($mock->__check, "Expected 'bar' to be called at least once on 'foo', but called 0 times.");
             };
 
             it 'should pass when called one time' => sub {
@@ -93,7 +93,7 @@ describe 'Test::Spec::RMock' => sub {
             my $mock = rmock('foo')->__cancel;
             $mock->should_not_receive('bar');
             $mock->bar;
-            is($mock->__check, 'Call constraint failed');
+            is($mock->__check, "Expected 'bar' to be called 0 times on 'foo', but it was called 1 time.");
         };
     };
 
@@ -189,7 +189,7 @@ describe 'Test::Spec::RMock' => sub {
             $mock->bar;
             $mock->bar;
             $mock->bar;
-            is($mock->__check, 'Call constraint failed');
+            is($mock->__check, "Expected 'bar' to be called 1 time on 'foo', but it was called 2 times.");
         };
     };
 

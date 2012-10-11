@@ -42,8 +42,8 @@ sub is_call_constrint_satisfied {
 }
 
 sub call_contraint_error_message {
-    my ($self) = @_;
-    "Call constraint failed";
+    my ($self, $mock_name) = @_;
+    $self->{_call_count_constraint}->error_message($mock_name, $self->{_name}, $self->{_number_of_times_called});
 }
 
 sub argument_matching_error_message {
