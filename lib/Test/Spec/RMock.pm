@@ -63,10 +63,23 @@ test you are writing.
 
 =over 4
 
-=item $mock->stub($message_name => $return_value)
+=item $mock->stub(%spec)
 
-This creates a method stub on the mock object returning
-C<$return_value> each time it is called.
+This creates method stubs for each message defined in %spec.
+
+  $mock->stub(
+      message1 => 'foo',
+      message2 => 'bar',
+  );
+  $mock->message1; # 'foo'
+  $mock->message2; # 'bar'
+
+=item $mock->stub_chain(@method_names)
+
+Creates a chain of two or more method stubs in one statement. 
+
+  $mock->stub_chain(qw(one two three))->and_return('four');
+  $mock->one->two->three; # 'four'
 
 =back
 
