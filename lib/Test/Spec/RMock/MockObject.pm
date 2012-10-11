@@ -93,7 +93,7 @@ sub __find_method_proxy {
         return $e if $e->does_arguments_match(@args);
     }
     for my $e (@$expectations) {
-        push @{$self->{_problems_found}}, $e->argument_matching_error_message;
+        push @{$self->{_problems_found}}, $e->argument_matching_error_message(@args);
     }
     return $expectations->[0];
 }

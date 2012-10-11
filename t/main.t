@@ -135,7 +135,7 @@ describe 'Test::Spec::RMock' => sub {
         it "should fail when there are arguments when none were expected" => sub {
             $mock->should_receive('bar')->with();
             $mock->bar(1);
-            is($mock->__check, 'Argument matching failed');
+            like($mock->__check, qr/^Argument matching failed.*got : array with 1 element.*expect : array with 0 element/s);
         };
 
         it "should pass when expecting the number '1' and it is given" => sub {
@@ -153,7 +153,7 @@ describe 'Test::Spec::RMock' => sub {
         it "should fail when expecting the number '1' and '2' is given" => sub {
             $mock->should_receive('bar')->with(1);
             $mock->bar(2);
-            is($mock->__check, 'Argument matching failed');
+            like($mock->__check, qr/^Argument matching failed.*got : '2'.*expect : '1'/s);
         };
 
         it "should pass when expecting (1, 'two') and it is given" => sub {

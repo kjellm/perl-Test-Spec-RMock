@@ -1,5 +1,7 @@
 package Test::Spec::RMock::MessageExpectation;
 
+use Test::Deep qw();
+
 sub new {
     my ($class, $name) = @_;
     my $self = {
@@ -29,11 +31,8 @@ sub is_all_conditions_satisfied {
 sub does_arguments_match {
     my ($self, @args) = @_;
     return 1 if $self->_any_arguments_allowed;
-    return if scalar(@args) != scalar(@{$self->{_arguments}});
-    for my $i (0..$#{$self->{_arguments}}) {
-        return if $args[$i] ne $self->{_arguments}[$i];
-    }
-    return 1;
+    my ($ok, $stack) = Test::Deep::cmp_details(\@args, $self->{_arguments});
+    return $ok;
 }
 
 sub is_call_constrint_satisfied {
@@ -47,10 +46,10 @@ sub call_contraint_error_message {
 }
 
 sub argument_matching_error_message {
-    my ($self) = @_;
-    "Argument matching failed";
+    my ($self, @args) = @_;
+    my ($ok, $stack) = Test::Deep::cmp_details(\@args, $self->{_arguments});
+    "Argument matching failed: " . Test::Deep::deep_diag($stack);
 }
-
 
 sub _any_arguments_allowed {
     my ($self) = @_;
