@@ -1,5 +1,9 @@
 {{$NEXT}}
 
+ - Better diagnostic messages
+
+2012-10-09: version 0.005001
+
  - Added support for stub several methods with one call to stub()
 
  - Added support for stub chaining
